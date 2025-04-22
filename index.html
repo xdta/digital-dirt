@@ -9,6 +9,7 @@
       color: #222;
       font-family: monospace;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
@@ -19,6 +20,18 @@
       text-align: center;
       white-space: pre-wrap;
     }
+    .button {
+      background: none;
+      border: none;
+      font-family: monospace;
+      font-size: 16px;
+      padding: 10px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .button:hover {
+      background-color: #ddd;
+    }
   </style>
 </head>
 <body>
@@ -28,9 +41,46 @@
    /       /       \/       \/       \/       \   
   |       |  DIGITAL DIRT  |       |       |    
    \__ __/\__ __/\__ __/\__ __/\__ __/\__ __/   
-
-  a project about memory, matter, and machines
   </pre>
+
+  <div>
+    <button class="button" onclick="toggleAudio('audio1')">[ PLAY AUDIO 1 ]</button>
+    <button class="button" onclick="toggleAudio('audio2')">[ PLAY AUDIO 2 ]</button>
+    <button class="button" onclick="toggleAudio('audio3')">[ PLAY AUDIO 3 ]</button>
+  </div>
+
+  <audio id="audio1" src="audio1.mp3"></audio>
+  <audio id="audio2" src="audio2.mp3"></audio>
+  <audio id="audio3" src="audio3.mp3"></audio>
+
+  <script>
+    const audioStates = {
+      audio1: false,
+      audio2: false,
+      audio3: false,
+    };
+
+    function toggleAudio(id) {
+      const audio = document.getElementById(id);
+
+      if (audio.paused) {
+        // Pause other audios
+        Object.keys(audioStates).forEach(key => {
+          if (key !== id) {
+            const otherAudio = document.getElementById(key);
+            otherAudio.pause();
+            otherAudio.currentTime = 0;
+            audioStates[key] = false;
+          }
+        });
+        audio.play();
+        audioStates[id] = true;
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+        audioStates[id] = false;
+      }
+    }
+  </script>
 </body>
 </html>
-
