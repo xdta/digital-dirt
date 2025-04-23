@@ -99,12 +99,15 @@
       });
       audio.play();
       audioStates[id] = true;
+      startSpinner(); // ← add this
     } else {
       audio.pause();
       audio.currentTime = 0;
       audioStates[id] = false;
     }
   }
+
+
 </script>
 
 <!-- ROTATING BEADS SCRIPT -->
@@ -138,10 +141,28 @@ function drawFrame(offset) {
 }
 
 let offset = 0;
-setInterval(() => {
-  drawFrame(offset);
-  offset = (offset + 1) % positions.length;
-}, 300);
+let intervalId = null;
+
+function anyAudioPlaying() {
+  return Object.values(audioStates).some(state => state);
+}
+
+function startSpinner() {
+  if (!intervalId) {
+    intervalId = setInterval(() => {
+      if (anyAudioPlaying()) {
+        drawFrame(offset);
+        offset = (offset + 1) % totalBeads;
+      }
+    }, 300);
+  }
+}
+
+function stopSpinner() {
+  // We keep it running but let it draw nothing
+  // so it can resume quickly when playback resumes
+}
+
 
 
 </script>
