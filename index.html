@@ -32,6 +32,12 @@
     .button:hover {
       background-color: #ddd;
     }
+    .row {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -43,44 +49,102 @@
    \__ __/\__ __/\__ __/\__ __/\__ __/\__ __/   
   </pre>
 
-  <div>
+  <div class="row">
     <button class="button" onclick="toggleAudio('audio1')">[ PLAY AUDIO 1 ]</button>
     <button class="button" onclick="toggleAudio('audio2')">[ PLAY AUDIO 2 ]</button>
     <button class="button" onclick="toggleAudio('audio3')">[ PLAY AUDIO 3 ]</button>
   </div>
 
+  <div class="row">
+    <button class="button" onclick="toggleAudio('lords')">[ LORD'S PRAYER ]</button>
+    <button class="button" onclick="toggleAudio('amitabha')">[ AMITABHA ]</button>
+    <button class="button" onclick="toggleAudio('kyrie')">[ KYRIE ELEISON ]</button>
+  </div>
+
+  <!-- Audio elements -->
   <audio id="audio1" src="audio1.mp3"></audio>
   <audio id="audio2" src="audio2.mp3"></audio>
   <audio id="audio3" src="audio3.mp3"></audio>
+  <audio id="lords" src="lords-prayer.mp3" loop></audio>
+  <audio id="amitabha" src="amitabha.mp3" loop></audio>
+  <audio id="kyrie" src="kyrie.mp3" loop></audio>
 
-  <script>
-    const audioStates = {
-      audio1: false,
-      audio2: false,
-      audio3: false,
-    };
+  <!-- CIRCLE BEAD SPINNER VISUAL -->
+  <pre id="circle-spinner" style="line-height: 1.2; font-family: monospace; margin-top: 20px;"></pre>
 
-    function toggleAudio(id) {
-      const audio = document.getElementById(id);
 
-      if (audio.paused) {
-        // Pause other audios
-        Object.keys(audioStates).forEach(key => {
-          if (key !== id) {
-            const otherAudio = document.getElementById(key);
-            otherAudio.pause();
-            otherAudio.currentTime = 0;
-            audioStates[key] = false;
-          }
-        });
-        audio.play();
-        audioStates[id] = true;
-      } else {
-        audio.pause();
-        audio.currentTime = 0;
-        audioStates[id] = false;
-      }
+
+<!-- AUDIO CONTROL SCRIPT -->
+<script>
+  const audioStates = {
+    audio1: false,
+    audio2: false,
+    audio3: false,
+    lords: false,
+    amitabha: false,
+    kyrie: false
+  };
+
+  function toggleAudio(id) {
+    const audio = document.getElementById(id);
+
+    if (audio.paused) {
+      Object.keys(audioStates).forEach(key => {
+        if (key !== id) {
+          const otherAudio = document.getElementById(key);
+          otherAudio.pause();
+          otherAudio.currentTime = 0;
+          audioStates[key] = false;
+        }
+      });
+      audio.play();
+      audioStates[id] = true;
+    } else {
+      audio.pause();
+      audio.currentTime = 0;
+      audioStates[id] = false;
     }
-  </script>
+  }
+</script>
+
+<!-- ROTATING BEADS SCRIPT -->
+<script>
+const spinner = document.getElementById("circle-spinner");
+const beadStates = [" . ", " o ", "(@)"]; // dim, mid, bright
+
+// Manually approximated 16-point circle coordinates on a 11x21 grid
+const positions = [
+  [0, 10], [1, 13], [3, 15], [5, 16],
+  [7, 15], [9, 13], [10, 10], [9, 7],
+  [7, 5], [5, 4], [3, 5], [1, 7],
+  [0, 10], // repeat to smooth edge
+  [1, 13], [3, 15], [5, 16]
+];
+
+let numRows = 11;
+let numCols = 21;
+let totalBeads = positions.length;
+
+function drawFrame(offset) {
+  let grid = Array.from({ length: numRows }, () => Array(numCols).fill("   "));
+
+  for (let i = 0; i < totalBeads; i++) {
+    let [r, c] = positions[i];
+    let stateIndex = (i === offset) ? 2 : (i === (offset - 1 + totalBeads) % totalBeads ? 1 : 0);
+    grid[r][c] = beadStates[stateIndex];
+  }
+
+  spinner.textContent = grid.map(row => row.join("")).join("\n");
+}
+
+let offset = 0;
+setInterval(() => {
+  drawFrame(offset);
+  offset = (offset + 1) % positions.length;
+}, 300);
+
+
+</script>
+
 </body>
 </html>
